@@ -1,0 +1,133 @@
+import React, { useEffect, useState } from 'react';
+import { View, Text, Button, TouchableOpacity } from 'react-native-ui-lib';
+import { TextInput, StyleSheet } from 'react-native'
+import { useForm, Controller } from 'react-hook-form';
+import { useRouter } from 'expo-router';
+
+type FormData = {
+  email: string;
+  password: string;
+  confirmPassword?: string;
+};
+
+export default function AuthScreen() {
+  const { control, handleSubmit, formState: { errors } } = useForm<FormData>();
+  const router = useRouter();
+  const [isLogin, setIsLogin] = useState(true);
+
+  useEffect(() => {
+    setTimeout(() => {
+      router.push('/phantom?productId=1');
+    }, 2000);
+    setTimeout(() => {
+      router.push('/info?productId=1');
+    }, 8000);
+  }, [])
+
+  const onSubmit = (data: FormData) => {
+    // Here you would typically make an API call for login/signup
+    // For now, we'll just navigate to the Home screen on success
+    router.push('/home');
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>{isLogin ? 'Login' : 'Sign Up'}</Text>
+
+      <Controller
+        control={control}
+        rules={{ required: true }}
+        render={({ field: { onChange, onBlur, value } }) => (
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            onBlur={onBlur}
+            onChangeText={onChange}
+            value={value}
+          />
+        )}
+        name="email"
+      />
+      {errors.email && <Text style={styles.error}>This is required.</Text>}
+
+      <Controller
+        control={control}
+        rules={{ required: true }}
+        render={({ field: { onChange, onBlur, value } }) => (
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            onBlur={onBlur}
+            onChangeText={onChange}
+            value={value}
+            secureTextEntry
+          />
+        )}
+        name="password"
+      />
+      {errors.password && <Text style={styles.error}>This is required.</Text>}
+
+      {!isLogin && (
+        <Controller
+          control={control}
+          rules={{ required: true }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              style={styles.input}
+              placeholder="Confirm Password"
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+              secureTextEntry
+            />
+          )}
+          name="confirmPassword"
+        />
+      )}
+      {!isLogin && errors.confirmPassword && <Text style={styles.error}>This is required.</Text>}
+
+      <Button onPress={handleSubmit(onSubmit)} >
+        <Text>
+          {isLogin ? 'Login' : 'Sign Up'}
+        </Text>
+      </Button>
+
+      <TouchableOpacity onPress={() => setIsLogin(!isLogin)} style={styles.switchContainer}>
+        <Text style={styles.switchText}>
+          {isLogin ? "Don't have an account? Sign Up" : 'Already have an account? Login'}
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+  },
+  title: {
+    fontSize: 24,
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  input: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginBottom: 10,
+    paddingHorizontal: 10,
+  },
+  error: {
+    color: 'red',
+    marginBottom: 10,
+  },
+  switchContainer: {
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  switchText: {
+    color: 'blue',
+  },
+});
